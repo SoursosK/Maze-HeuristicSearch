@@ -3,101 +3,69 @@ import java.util.Arrays;
 
 
 public class Node {
-    // private String name;
+    private int indexX;
+    private int indexY;
 
-    // private BridgeAndTorch bt;
+    private Placeholder[][] grid;
 
-    // private Node parentNode;
-    // private ArrayList<Node> children;
-    // private int state[];
+    private Node parentNode;
+    private ArrayList<Node> children;
 
-    // private int depth;
-    // private int cost;
+    private int depth;
+    private int cost;
 
-    // public Node(String name, BridgeAndTorch bt, Node parentNode, int state[], int depth, int cost) {
-    //     this.name = name;
+    public Node(int indexX, int indexY, Placeholder[][] grid, Node parentNode, int depth, int cost) {
+        this.indexX = indexX;
+        this.indexY = indexY;
+
+        this.grid = grid;
+
+        this.parentNode = parentNode;
+        this.children = null;
+
+        this.depth = depth;
+        this.cost = cost;
+
+        this.bt.incrementCreatedNodesCounter();
+    }
+
+    public boolean checkIfTargetNode(int indexX, int indexY){
+        if(this.indexX == indexX && this.indexY == indexY)
+            return true;
+        return false;
+    }
+
+    public void createChildren() {
+        this.children = new ArrayList<>();
+        int x = this.indexX, y = this.indexY;
+
+        if(this.grid[x][y].getUpperEdge() != 0)
+            this.children.add( new Node(x-1, y, this.grid, this, this.depth+1, this.grid[x][y].getUpperEdge()) );
         
-    //     this.bt = bt;
+        if (this.grid[x][y].getLowerEdge() != 0)
+            this.children.add(new Node(x+1, y, this.grid, this, this.depth+1, this.grid[x][y].getLowerEdge()));
 
-    //     this.parentNode = parentNode;
-    //     this.children = null;
-    //     this.state = state;
+        if (this.grid[x][y].getRightEdge() != 0)
+            this.children.add(new Node(x, y+1, this.grid, this, this.depth + 1, this.grid[x][y].getRightEdge()));
 
-    //     this.depth = depth;
-    //     this.cost = cost;
+        if (this.grid[x][y].getLeftEdge() != 0)
+            this.children.add(new Node(x, y-1, this.grid, this, this.depth + 1, this.grid[x][y].getLeftEdge()));
+    }
 
-    //     this.bt.incrementCreatedNodesCounter();
-    // }
+    public Node getParentNode() {
+        return parentNode;
+    }
 
-    // public boolean checkFiniteState(){
-    //     if(Arrays.equals(this.state, this.bt.getFiniteState()))
-    //         return true;
-    //     else
-    //         return false;
-    // }
+    public ArrayList<Node> getChildren() {
+        return children;
+    }
 
-    // public void createChildren() {
-    //     this.children = new ArrayList<>();
+    public int getDepth() {
+        return depth;
+    }
 
-    //     // if the torch is on the left side
-    //     if (state[state.length - 1] == 0)
-            
-    //         // create all the possible pairs of indexes
-    //         for (int i = 0; i < state.length - 1; i++)
-    //             for (int j = i + 1; j < state.length - 1; j++){
-
-    //                 if (this.state[i] == 0 && this.state[j] == 0) {
-    //                     int childState[] = this.state.clone();
-    //                     childState[i] = 1;
-    //                     childState[j] = 1;
-    //                     childState[childState.length - 1] = 1; // torch goes right
-
-    //                     int crossingTime = bt.calculateCrossingTime(i, j);
-
-    //                     children.add(new Node(i+""+j, bt, this, childState, this.depth + 1, this.cost + crossingTime));
-                        
-    //                     System.out.println("child created left side");
-    //                 }
-    //             }
-
-    //     // if the torch is on the right side
-    //     if (state[state.length - 1] == 1)
-
-    //         for (int i = 0; i < state.length - 1; i++)
-
-    //             if (this.state[i] == 1) {
-    //                 int childState[] = this.state.clone();
-    //                 childState[i] = 0;
-    //                 childState[state.length - 1] = 0; // torch goes left
-
-    //                 int crossingTime = bt.getCrossingTime(i);
-
-    //                 this.children.add(new Node(i+"", bt, this, childState, this.depth + 1, this.cost + crossingTime));
-                    
-    //                 System.out.println("child created right side");
-    //             }
-
-    // }
-
-    // public Node getParentNode() {
-    //     return parentNode;
-    // }
-
-    // public ArrayList<Node> getChildren() {
-    //     return children;
-    // }
-
-    // public int getDepth() {
-    //     return depth;
-    // }
-
-    // public int getCost() {
-    //     return cost;
-    // }
-
-    // public String getName() {
-    //     return name;
-    // }
-
+    public int getCost() {
+        return cost;
+    }
 
 }
