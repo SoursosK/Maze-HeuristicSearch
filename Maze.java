@@ -1,82 +1,171 @@
 import java.util.Random;
+import java.util.Arrays;
+import java.util.LinkedList;
+
+// The grid cosists of n x n placeholder Nodes, which contain the 4 possible paths
+// to the neighbouring Node. The paths are represented by the placeholder's edges.
 
 public class Maze {
 
-    // private LinkedList<Node> dataStructure;
+    private LinkedList<Node> dataStructure;
 
     private Placeholder grid[][];
 
     private int createdNodesCounter;
     private int visitedNodesCounter;
 
+    private int startX, startY, targetX, targetY;
+
     public Maze(int numberOfLines, int percentageRemoving, int maxWeight) {
 
         grid = this.initializeGrid(numberOfLines, percentageRemoving, maxWeight);
 
-        // UCS();
+        do {
+            Random rand = new Random(System.currentTimeMillis());
+            this.startX = rand.nextInt(numberOfLines);
+            this.startY = rand.nextInt(numberOfLines);
+            this.targetX = rand.nextInt(numberOfLines);
+            this.targetY = rand.nextInt(numberOfLines);
+        } while (this.impossibleToFind());
+
+        // Testing purposes ; simulating target being cut off
+        // this.targetX = 0;
+        // this.targetY = 0;
+        // this.grid[0][0].setEdges0();
+
+        this.printGrid(numberOfLines);
+
+        // Testing purposes
+        // UCS(2000);
+        // BestFirstSearch();
+        // Astar();
+    }
+
+    private void setParameters() {
+        this.dataStructure = new LinkedList<>();
+        this.createdNodesCounter = 0;
+        this.visitedNodesCounter = 0;
+    }
+
+    // Uncomment the lines below to see the exact path of the algorithm
+    private void UCS(int maxVisitedNods) {
+        this.setParameters();
+
+        this.dataStructure.add(new Node(this.startX, this.startY, this.grid, null, 0, 0, this));
+
+        while (!dataStructure.isEmpty()) {
+            if(this.visitedNodesCounter >= maxVisitedNods) {
+                System.out.println("\nVisited Nodes are over " + this.visitedNodesCounter + ".\nMax Nodes visited number exceeded.\nReturning..");
+                return;
+            }
+            this.visitedNodesCounter++;
+            // System.out.println("\n" + this.visitedNodesCounter);
+
+            Node minCostNode = null;
+            int minCost = Integer.MAX_VALUE;
+            for (int i = 0; i < this.dataStructure.size(); i++)
+
+                if (this.dataStructure.get(i).getCost() < minCost) {
+                    minCost = this.dataStructure.get(i).getCost();
+                    minCostNode = this.dataStructure.get(i);
+                }
+
+            Node node = minCostNode;
+
+            // System.out.println("node " + node.getLocation() + " depth: " +
+            // node.getDepth());
+            this.dataStructure.remove(node);
+
+            if (!node.checkIfTargetNode(this.targetX, this.targetY)) {
+                node.createChildren();
+
+                for (Node childNode : node.getChildren())
+                    this.dataStructure.addLast(childNode);
+            } else {
+                this.printOutput(node, "UCS");
+                return;
+            }
+        }
+        System.out.println("problem");
+    }
+
+    private void printOutput(Node node, String algorithmName) {
+        System.out.println("\n" + algorithmName + " found a solution to the problem!");
+        System.out.println("The final cost is " + node.getCost() + " minutes.");
+        System.out.println("The nodes created were " + this.createdNodesCounter + ", with " + this.visitedNodesCounter
+                + " of them being visited.\n");
     }
 
     private Placeholder[][] initializeGrid(int numberOfLines, int percentageRemoving, int maxWeight) {
         Placeholder grid[][] = new Placeholder[numberOfLines][numberOfLines];
 
-        for(int i = 0; i < numberOfLines; i++)
-            for (int j = 0; j < numberOfLines; j++){
+        // Creates the nxn grid and initiazes the edge's weights
+        for (int i = 0; i < numberOfLines; i++)
+            for (int j = 0; j < numberOfLines; j++)
                 grid[i][j] = new Placeholder(grid, i, j, maxWeight, numberOfLines);
-            }
-        
-        int edgesToRemove = 2 * numberOfLines * (numberOfLines - 1) * percentageRemoving/100;
 
+        int edgesToRemove = 2 * numberOfLines * (numberOfLines - 1) * percentageRemoving / 100;
         Random rand = new Random(System.currentTimeMillis());
-        for(int i=edgesToRemove; i>0; i--){
+
+        for (int i = edgesToRemove; i > 0; i--) {
             int x = rand.nextInt(numberOfLines);
             int y = rand.nextInt(numberOfLines);
-            grid[x][y].removeEdge();
+            if(!grid[x][y].isIsolated())
+                grid[x][y].removeEdge();
+            else
+                i++;
         }
 
-        // Testing pursposes        
+        // Testing pursposes
         // for (int i = 0; i < numberOfLines; i++)
-        //     for (int j = 0; j < numberOfLines; j++) {
-        //         grid[i][j].getLocation();
-        //         grid[i][j].getEdges();
-        //     }
+        // for (int j = 0; j < numberOfLines; j++) {
+        // System.out.println(grid[i][j].getLocation());
+        // grid[i][j].getEdges();
+        // }
 
         return grid;
     }
 
-    // private void UCS() {
-    // this.dataStructure.add(new Node("startingNode", this, null, this.state, 0,
-    // 0));
+    private void printGrid(int numberOfLines) {
+        String gridToShow[][] = new String[numberOfLines][numberOfLines];
 
-    // while (!dataStructure.isEmpty()) {
-    // this.visitedNodesCounter++;
-    // System.out.println("\n" + this.visitedNodesCounter);
+        for (int i = 0; i < numberOfLines; i++)
+            for (int j = 0; j < numberOfLines; j++) {
+                gridToShow[i][j] = grid[i][j].getLocation();
+            }
 
-    // Node minCostNode = null;
-    // int minCost = Integer.MAX_VALUE;
-    // for (int i = 0; i < this.dataStructure.size(); i++)
+        gridToShow[this.startX][this.startY] = " S ";
+        gridToShow[this.targetX][this.targetY] = " T ";
 
-    // if (this.dataStructure.get(i).getCost() < minCost) {
-    // minCost = this.dataStructure.get(i).getCost();
-    // minCostNode = this.dataStructure.get(i);
-    // }
+        for (int i = 0; i < numberOfLines; i++)
+            System.out.println(Arrays.toString(gridToShow[i]));
+        ;
 
-    // Node node = minCostNode;
+    }
 
-    // System.out.println("node " + node.getName() + " depth: " + node.getDepth());
-    // this.dataStructure.remove(node);
+    public boolean impossibleToFind() {
+        if (this.grid[this.targetX][this.targetY].isIsolated()) {
+            System.out.println("\nTargert node's Edges are.. ");
+            this.grid[this.targetX][this.targetY].getEdges();
+            System.out.println("\nProblem can't be solved.");
+            System.out.println("Reallocating..\n");
+            return true;
+        }
 
-    // if (!node.checkFiniteState()) {
-    // node.createChildren();
+        if (this.grid[this.startX][this.startY].isIsolated()) {
+            System.out.println("\nStarting node's Edges are.. ");
+            this.grid[this.startX][this.startY].getEdges();
+            System.out.println("\nProblem can't be solved.");
+            System.out.println("Reallocating..\n");
+            return true;
+        }
 
-    // for (Node childNode : node.getChildren())
-    // this.dataStructure.addLast(childNode);
-    // } else {
-    // printOutput(node, "UCS");
-    // return;
-    // }
-    // }
+        return false;
+    }
 
-    // }
+    public void incrementCreatedNodesCounter() {
+        this.createdNodesCounter++;
+    }
 
     public static void main(String[] args) {
         // int numberOfLines;

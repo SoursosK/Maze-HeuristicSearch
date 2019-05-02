@@ -14,7 +14,7 @@ public class Placeholder {
 
     public Placeholder(Placeholder[][] grid, int indexX, int indexY, int maxWeight, int tableAxesLength) {
         this.grid = grid;
-        
+
         this.indexX = indexX;
         this.indexY = indexY;
 
@@ -104,43 +104,49 @@ public class Placeholder {
 
     public void removeEdge() {
         Random rand = new Random(System.currentTimeMillis());
-        
+
         while (true) {
             int side = rand.nextInt(4);
 
             if (side == 0) {
                 if (this.upperEdge == 0)
                     continue;
-                
+
                 this.upperEdge = 0;
-                this.grid[this.indexX-1][this.indexY].deleteLowerEdge();
+                this.grid[this.indexX - 1][this.indexY].deleteLowerEdge();
             } else if (side == 1) {
                 if (this.lowerEdge == 0)
                     continue;
 
                 this.lowerEdge = 0;
-                this.grid[this.indexX+1][this.indexY].deleteUpperEdge();
+                this.grid[this.indexX + 1][this.indexY].deleteUpperEdge();
             } else if (side == 2) {
                 if (this.rightEdge == 0)
                     continue;
-                
+
                 this.rightEdge = 0;
-                this.grid[this.indexX][this.indexY+1].deleteLeftEdge();
+                this.grid[this.indexX][this.indexY + 1].deleteLeftEdge();
             } else if (side == 3) {
                 if (this.leftEdge == 0)
                     continue;
 
                 this.leftEdge = 0;
-                this.grid[this.indexX][this.indexY-1].deleteRightEdge();
+                this.grid[this.indexX][this.indexY - 1].deleteRightEdge();
             }
             return;
         }
+    }
 
+    public boolean isIsolated() {
+        if (this.upperEdge == 0 && this.lowerEdge == 0 && 
+            this.rightEdge == 0 && this.leftEdge == 0)
+            return true;
+        return false;
     }
 
     // testing purposes
-    public void getLocation() {
-        System.out.println(this.indexX + "," + this.indexY);
+    public String getLocation() {
+        return this.indexX + "," + this.indexY;
     }
 
     // testing purposes
@@ -151,4 +157,9 @@ public class Placeholder {
         System.out.println("Left: " + this.leftEdge);
     }
 
+    // testing purposes ; helps in simulating target being cut off
+    public void setEdges0() {
+        this.rightEdge = 0;
+        this.lowerEdge = 0;
+    }
 }
