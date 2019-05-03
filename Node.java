@@ -1,9 +1,8 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.lang.*;
 
 public class Node {
-    private Maze maze;
-
     private int indexX;
     private int indexY;
 
@@ -16,8 +15,6 @@ public class Node {
     private int cost;
 
     public Node(int indexX, int indexY, Placeholder[][] grid, Node parentNode, int depth, int cost, Maze maze) {
-        this.maze = maze;
-        
         this.indexX = indexX;
         this.indexY = indexY;
 
@@ -29,7 +26,7 @@ public class Node {
         this.depth = depth;
         this.cost = cost;
 
-        this.maze.incrementCreatedNodesCounter();
+        maze.incrementCreatedNodesCounter();
     }
 
     public boolean checkIfTargetNode(int indexX, int indexY){
@@ -38,21 +35,21 @@ public class Node {
         return false;
     }
 
-    public void createChildren() {
+    public void createChildren(Maze maze) {
         this.children = new ArrayList<>();
         int x = this.indexX, y = this.indexY;
 
         if(this.grid[x][y].getUpperEdge() != 0)
-            this.children.add( new Node(x-1, y, this.grid, this, this.depth+1, this.cost + this.grid[x][y].getUpperEdge(), this.maze) );
+            this.children.add( new Node(x-1, y, this.grid, this, this.depth+1, this.cost + this.grid[x][y].getUpperEdge(), maze) );
         
         if (this.grid[x][y].getLowerEdge() != 0)
-            this.children.add( new Node(x+1, y, this.grid, this, this.depth+1, this.cost + this.grid[x][y].getLowerEdge(), this.maze) );
+            this.children.add( new Node(x+1, y, this.grid, this, this.depth+1, this.cost + this.grid[x][y].getLowerEdge(), maze) );
 
         if (this.grid[x][y].getRightEdge() != 0)
-            this.children.add( new Node(x, y+1, this.grid, this, this.depth + 1, this.cost + this.grid[x][y].getRightEdge(), this.maze) );
+            this.children.add( new Node(x, y+1, this.grid, this, this.depth + 1, this.cost + this.grid[x][y].getRightEdge(), maze) );
 
         if (this.grid[x][y].getLeftEdge() != 0)
-            this.children.add( new Node(x, y-1, this.grid, this, this.depth + 1, this.cost + this.grid[x][y].getLeftEdge(), this.maze) );
+            this.children.add( new Node(x, y-1, this.grid, this, this.depth + 1, this.cost + this.grid[x][y].getLeftEdge(), maze) );
     }
 
     public Node getParentNode() {
@@ -74,5 +71,9 @@ public class Node {
     public String getLocation() {
         return this.indexX + "," + this.indexY;
     }
+
+    public int manhattanDistance(int targetX, int targetY) {
+        return Math.abs(targetX - this.indexX) + Math.abs(targetY - this.indexY);
+    } 
 
 }
