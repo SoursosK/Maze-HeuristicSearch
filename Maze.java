@@ -221,7 +221,7 @@ public class Maze {
         return grid;
     }
 
-    private void printGrid(int numberOfLines) {
+    private void printGrid1(int numberOfLines) {
         String gridToShow[][] = new String[numberOfLines][numberOfLines];
         System.out.println();
 
@@ -234,6 +234,32 @@ public class Maze {
         gridToShow[this.targetX][this.targetY] = " T ";
 
         for (int i = 0; i < numberOfLines; i++)
+            System.out.println(Arrays.toString(gridToShow[i]));
+    }
+
+    private void printGrid(int numberOfLines) {
+        String gridToShow[][] = new String[numberOfLines*2-1][numberOfLines*2-1];
+        System.out.println();
+        for (int i = 0; i < numberOfLines*2-1; i++)
+            for (int j = 0; j < numberOfLines*2-1; j++) 
+                gridToShow[i][j] = "   ";
+            
+
+        for (int i = 0; i < numberOfLines*2-1; i+=2)
+            for (int j = 0; j < numberOfLines*2-1; j+=2) {
+                gridToShow[i][j] = grid[i/2][j/2].getLocation();
+                if(!(j == numberOfLines*2-2)){
+                    gridToShow[i][j+1] = " " + this.grid[i/2][j/2].getRightEdge() + " ";
+                }
+                if(!(i == numberOfLines*2-2)){
+                    gridToShow[i+1][j] = " " + this.grid[i/2][j/2].getLowerEdge() + " ";
+                }
+            }
+
+        gridToShow[this.startX*2][this.startY*2] = " S ";
+        gridToShow[this.targetX*2][this.targetY*2] = " T ";
+
+        for (int i = 0; i < numberOfLines*2-1; i++)
             System.out.println(Arrays.toString(gridToShow[i]));
     }
 
@@ -268,6 +294,7 @@ public class Maze {
     }
 
     public static void main(String[] args) {
+        
         int numberOfLines;
         int percentageRemoving;
         int maxWeight;
@@ -286,7 +313,7 @@ public class Maze {
         Maze maze = new Maze(numberOfLines, percentageRemoving, maxWeight);
 
         // Testing Purposes
-        // Maze maze = new Maze(5, 20, 10);
+        // Maze maze = new Maze(5, 20, 9);
 
         System.out.println("\nPlease insert the maximum number of nodes that an algorithm is allowed to visit: ");
         int maxNodes = sc.nextInt();
